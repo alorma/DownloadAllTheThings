@@ -10,12 +10,11 @@ import android.content.Intent
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 
-class DownloadCompleteBroadcast(private val retrieve: (Long) -> DownloadItem?,
-                                private val removeItem: (Long) -> Unit) : BroadcastReceiver() {
+class DownloadCompleteBroadcast(private val map: MutableMap<Long, DownloadItem> = mutableMapOf()) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
 
-        retrieve.invoke(referenceId)?.let {
+        map[referenceId]?.let {
             showNotification(context, referenceId, it)
         }
     }
@@ -40,6 +39,10 @@ class DownloadCompleteBroadcast(private val retrieve: (Long) -> DownloadItem?,
 
         notificationManager.notify(refId.toInt(), mBuilder.build())
 
-        removeItem.invoke(refId)
+        map.remove(refId)
+    }
+
+    fun addDownload(id: Long, item: DownloadItem) {
+        map.put(id, item)
     }
 }

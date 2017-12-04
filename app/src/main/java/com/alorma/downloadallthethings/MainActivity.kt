@@ -22,10 +22,8 @@ class MainActivity : AppCompatActivity() {
         val IMAGE_URL = DownloadItem("https://avatars2.githubusercontent.com/u/887462?s=460&v=4", "Image", "avatar.jpg")
     }
 
-    private val map = mutableMapOf<Long, DownloadItem>()
-
     private var itemToDownload: DownloadItem? = null
-    private val broadcast = DownloadCompleteBroadcast({ map[it] }, { map.remove(it) })
+    private val broadcast = DownloadCompleteBroadcast()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val refId = downloadManager.enqueue(request)
-        map.put(refId, item)
+        broadcast.addDownload(refId, item)
     }
 
     private fun hasPermission(): Boolean =
