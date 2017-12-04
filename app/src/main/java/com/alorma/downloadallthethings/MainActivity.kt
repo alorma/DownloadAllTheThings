@@ -3,6 +3,7 @@ package com.alorma.downloadallthethings
 import android.Manifest
 import android.app.DownloadManager
 import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -11,7 +12,6 @@ import android.os.Environment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,12 +22,25 @@ class MainActivity : AppCompatActivity() {
         val IMAGE_URL = DownloadItem("https://avatars2.githubusercontent.com/u/887462?s=460&v=4", "Image", "avatar.jpg")
     }
 
+    private val map = mutableMapOf<Long, DownloadItem>()
+
     private var itemToDownload: DownloadItem? = null
+    private val broadcast = DownloadCompleteBroadcast({ map[it] }, { map.remove(it) })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        addBroadcast()
+        buildButtons()
+    }
+
+    private fun addBroadcast() {
+        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        registerReceiver(broadcast, intentFilter)
+    }
+
+    private fun buildButtons() {
         downloadZip.setOnClickListener {
             if (hasPermission()) {
                 download(DOWNLOAD_URL)
@@ -64,7 +77,8 @@ class MainActivity : AppCompatActivity() {
             setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/DownloadAllTheThings/${item.filename}")
         }
 
-        downloadManager.enqueue(request)
+        val refId = downloadManager.enqueue(request)
+        map.put(refId, item)
     }
 
     private fun hasPermission(): Boolean =
@@ -90,5 +104,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(broadcast)
     }
 }
