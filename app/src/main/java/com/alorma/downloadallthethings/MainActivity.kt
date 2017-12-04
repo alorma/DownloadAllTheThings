@@ -57,11 +57,12 @@ class MainActivity : AppCompatActivity() {
     private fun download(item: DownloadItem) {
         val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-        val request = DownloadManager.Request(Uri.parse(item.url))
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-        request.setTitle(item.title)
-        request.setDescription("Downloading ${item.title}")
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/DownloadAllTheThings/${item.filename}")
+        val request = DownloadManager.Request(Uri.parse(item.url)).apply {
+            setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            setTitle(item.title)
+            setDescription("Downloading ${item.title}")
+            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/DownloadAllTheThings/${item.filename}")
+        }
 
         downloadManager.enqueue(request)
     }
