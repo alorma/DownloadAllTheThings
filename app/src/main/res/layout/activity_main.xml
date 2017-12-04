@@ -18,4 +18,11 @@
         android:layout_height="wrap_content"
         android:text="Download IMAGE" />
 
+
+    <Button
+        android:id="@+id/downloadAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download ALL" />
+
 </LinearLayout>

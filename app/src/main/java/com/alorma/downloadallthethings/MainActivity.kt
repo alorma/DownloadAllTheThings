@@ -43,6 +43,15 @@ class MainActivity : AppCompatActivity() {
                 requestPermission(IMAGE_URL)
             }
         }
+
+        downloadAll.setOnClickListener {
+            if (hasPermission()) {
+                download(DOWNLOAD_URL)
+                download(IMAGE_URL)
+            } else {
+                requestPermission()
+            }
+        }
     }
 
     private fun download(item: DownloadItem) {
@@ -60,12 +69,14 @@ class MainActivity : AppCompatActivity() {
     private fun hasPermission(): Boolean =
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
-    private fun requestPermission(item: DownloadItem) {
+    private fun requestPermission(item: DownloadItem? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            itemToDownload = item;
+            itemToDownload = item
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), permissionRequest)
         } else {
-            download(item)
+            item?.let {
+                download(it)
+            }
         }
     }
 
